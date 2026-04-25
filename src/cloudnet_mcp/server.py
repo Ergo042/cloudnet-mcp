@@ -229,13 +229,15 @@ async def call_tool(
         identifier = arguments.get("identifier")
         cmd = arguments.get("command")
         data = await client.request("POST", f"service/{identifier}/command", json={"command": cmd})
-        return [types.TextContent(type="text", text=str(data))]    elif name == "get_api_token":
+        return [types.TextContent(type="text", text=str(data))]
+    elif name == "get_api_token":
         if not client.token:
             await client._authenticate()
         return [types.TextContent(type="text", text=str({"token": client.token}))]
     elif name == "refresh_api_token":
         await client._authenticate()
-        return [types.TextContent(type="text", text=str({"token": client.token, "status": "refreshed"}))]    else:
+        return [types.TextContent(type="text", text=str({"token": client.token, "status": "refreshed"}))]
+    else:
         raise ValueError(f"Unknown tool: {name}")
 
 async def run():
