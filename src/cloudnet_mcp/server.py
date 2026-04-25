@@ -88,13 +88,21 @@ async def list_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="get_online_player_count",
+            description="Get the total number of currently online players in the network",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        types.Tool(
             name="get_online_players",
             description="Get a list of online players based on the query parameters",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "limit": {"type": "integer", "description": "The maximum amount of players to respond with"},
-                    "skip": {"type": "integer", "description": "The amount of players to skip"},
+                    "limit": {"type": "integer", "description": "The maximum amount of players to respond with (max 25)", "maximum": 25},
+                    "offset": {"type": "integer", "description": "The amount of players to skip"},
                     "sort": {"type": "string", "enum": ["asc", "desc"], "description": "Sort players by name"},
                 },
             },
@@ -160,6 +168,48 @@ async def list_tools() -> list[types.Tool]:
             },
         ),
         types.Tool(
+            name="get_tasks",
+            description="Lists all tasks that are known by the node",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        types.Tool(
+            name="get_task_info",
+            description="Get detailed information about a specific task",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "The name of the task to get"}
+                },
+                "required": ["name"],
+            },
+        ),
+        types.Tool(
+            name="change_service_lifecycle",
+            description="Updates the lifecycle of a service (start, stop, restart)",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "identifier": {"type": "string", "description": "The name or unique id of the service"},
+                    "target": {"type": "string", "enum": ["start", "stop", "restart"], "description": "The target service lifecycle phase"}
+                },
+                "required": ["identifier", "target"],
+            },
+        ),
+        types.Tool(
+            name="get_service_logs",
+            description="Get the cached log lines of a service",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "identifier": {"type": "string", "description": "The name or unique id of the service"}
+                },
+                "required": ["identifier"],
+            },
+        ),
+        types.Tool(
             name="get_api_token",
             description="Gets the currently active access token for the REST API",
             inputSchema={
@@ -196,9 +246,12 @@ async def call_tool(
     elif name == "get_services":
         data = await client.request("GET", "service")
         return [types.TextContent(type="text", text=str(data))]
+    elif name == "get_online_player_count":
+        data = await client.request("GET", "player/onlineCount")
+        return [types.TextContent(type="text", text=str(data))]
     elif name == "get_online_players":
         params = {}
-        for key in ["limit", "skip", "sort"]:
+        for key in ["limit", "offset", "sort"]:
             if key in arguments:
                 params[key] = arguments[key]
         data = await client.request("GET", "player/online", params=params)
@@ -229,6 +282,22 @@ async def call_tool(
         identifier = arguments.get("identifier")
         cmd = arguments.get("command")
         data = await client.request("POST", f"service/{identifier}/command", json={"command": cmd})
+        return [types.TextContent(type="text", text=str(data))]
+    elif name == "get_tasks":
+        data = await client.request("GET", "task")
+        return [types.TextContent(type="text", text=str(data))]
+    elif name == "get_task_info":
+        name_arg = arguments.get("name")
+        data = await client.request("GET", f"task/{name_arg}")
+        return [types.TextContent(type="text", text=str(data))]
+    elif name == "change_service_lifecycle":
+        identifier = arguments.get("identifier")
+        target = arguments.get("target")
+        data = await client.request("PATCH", f"service/{identifier}/lifecycle", params={"target": target})
+        return [types.TextContent(type="text", text=str(data))]
+    elif name == "get_service_logs":
+        identifier = arguments.get("identifier")
+        data = await client.request("GET", f"service/{identifier}/logLines")
         return [types.TextContent(type="text", text=str(data))]
     elif name == "get_api_token":
         if not client.token:
