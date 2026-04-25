@@ -1,0 +1,18 @@
+[project]
+name = "cloudnet-mcp"
+version = "0.1.0"
+description = "A standard MCP server for CloudNet v3 based on rest API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp>=1.2.0",
+    "pydantic>=2.13.3",
+]
+
+[project.scripts]
+cloudnet-mcp = "cloudnet_mcp.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
