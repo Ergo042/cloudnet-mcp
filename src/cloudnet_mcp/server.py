@@ -28,7 +28,7 @@ class CloudNetClient:
         )
         resp.raise_for_status()
         data = resp.json()
-        self.token = data.get("token")
+        self.token = data.get("accessToken", {}).get("token")
         self.client.headers.update({"Authorization": f"Bearer {self.token}"})
 
     async def request(self, method: str, endpoint: str, **kwargs):
@@ -159,6 +159,22 @@ async def list_tools() -> list[types.Tool]:
                 "required": ["identifier", "command"],
             },
         ),
+        types.Tool(
+            name="get_api_token",
+            description="Gets the currently active access token for the REST API",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
+        types.Tool(
+            name="refresh_api_token",
+            description="Forces an immediate refresh of the REST API access token",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+            },
+        ),
     ]
 
 @app.call_tool()
@@ -213,8 +229,13 @@ async def call_tool(
         identifier = arguments.get("identifier")
         cmd = arguments.get("command")
         data = await client.request("POST", f"service/{identifier}/command", json={"command": cmd})
-        return [types.TextContent(type="text", text=str(data))]
-    else:
+        return [types.TextContent(type="text", text=str(data))]    elif name == "get_api_token":
+        if not client.token:
+            await client._authenticate()
+        return [types.TextContent(type="text", text=str({"token": client.token}))]
+    elif name == "refresh_api_token":
+        await client._authenticate()
+        return [types.TextContent(type="text", text=str({"token": client.token, "status": "refreshed"}))]    else:
         raise ValueError(f"Unknown tool: {name}")
 
 async def run():
