@@ -1,0 +1,84 @@
+# CloudNet MCP Server Configuration
+# ==================================
+# Copy this file to config.yaml and customize as needed
+
+# QQ Bot Integration Mode
+# When enabled, responses are formatted for QQ group messages
+# and additional QQ-optimized tools become available
+qq_mode:
+  # Enable QQ mode
+  enabled: false
+
+  # Message formatting style
+  # "compact" - Single line, minimal emojis
+  # "detailed" - Multi-line with emojis and separators (default)
+  style: "detailed"
+
+  # Use Chinese responses
+  chinese_responses: true
+
+  # Enable safe command execution only
+  # When true, only commands in safe_commands lists can be executed
+  # via execute_safe_command tool
+  safe_commands_only: true
+
+  # Maximum message length (QQ has character limits)
+  # Messages longer than this will be truncated
+  max_message_length: 4000
+
+# Safe Commands Configuration
+# Used by execute_safe_command tool when safe_commands_only is enabled
+safe_commands:
+  # Guest level - available to all users
+  guest:
+    - "list"
+    - "tps"
+    - "whitelist list"
+    - "seed"
+    - "difficulty"
+    - "time query"
+    - "gamerule query"
+
+  # Admin level - requires admin permission
+  admin:
+    - "whitelist add"
+    - "whitelist remove"
+    - "whitelist on"
+    - "whitelist off"
+    - "kick"
+    - "ban"
+    - "pardon"
+    - "gamemode"
+    - "tp"
+    - "give"
+    - "clear"
+    - "effect"
+
+  # Super user level - requires highest permission
+  super_user:
+    - "stop"
+    - "restart"
+    - "reload"
+    - "save-all"
+    - "save-off"
+    - "save-on"
+    - "defaultgamemode"
+    - "gamerule set"
+
+# Blocked command patterns (regex)
+# These commands are never allowed, even if in safe_commands
+blocked_patterns:
+  - "op\\s+"           # Block op command
+  - "deop\\s+"         # Block deop command
+  - "execute\\s+"      # Block execute command
+  - "fill\\s+.*destroy"  # Block destructive fill
+  - "clone\\s+"        # Block clone command
+
+# Server display names (for QQ messages)
+# Map service names to friendly Chinese names
+server_aliases:
+  "Lobby-1": "大厅服"
+  "Survival-1": "生存服"
+  "Creative-1": "创造服"
+  "SkyWars-1": "空岛战争"
+  "BedWars-1": "起床战争"

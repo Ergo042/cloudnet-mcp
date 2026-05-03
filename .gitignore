@@ -46,6 +46,8 @@ htmlcov/
 .idea/
 *.swp
 *.swo
+.mcp.json
+CLAUDE.md
 
 # Project specific
 swagger.yaml
