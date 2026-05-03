@@ -24,17 +24,163 @@ class QQModeConfig(BaseModel):
     max_message_length: int = 4000
 
 
+class CommandDefinition(BaseModel):
+    """Definition of a command with usage info."""
+    command: str  # The command prefix (e.g., "kick", "whitelist add")
+    args: str = ""  # Argument template (e.g., "<玩家> [原因]")
+    description: str = ""  # Chinese description for QQ display
+
+    def matches(self, input_command: str) -> bool:
+        """Check if input command matches this definition."""
+        return input_command.lower().startswith(self.command.lower())
+
+    def to_simple_string(self) -> str:
+        """Convert to simple command string for matching."""
+        return self.command
+
+
+def get_builtin_guest_commands() -> List[CommandDefinition]:
+    """Get built-in guest level commands."""
+    return [
+        CommandDefinition(command="list", args="", description="查看在线玩家列表"),
+        CommandDefinition(command="tps", args="", description="查看服务器TPS"),
+        CommandDefinition(command="seed", args="", description="查看世界种子"),
+        CommandDefinition(command="difficulty", args="", description="查看游戏难度"),
+        CommandDefinition(command="whitelist list", args="", description="查看白名单列表"),
+        CommandDefinition(command="time query", args="[daytime/gametime/day]", description="查询游戏时间"),
+        CommandDefinition(command="gamerule query", args="<规则名>", description="查询游戏规则"),
+        CommandDefinition(command="scoreboard objectives list", args="", description="列出计分板目标"),
+        CommandDefinition(command="scoreboard players list", args="[目标名]", description="列出计分板玩家"),
+        CommandDefinition(command="bossbar list", args="", description="列出Boss栏"),
+        CommandDefinition(command="trigger", args="<目标>", description="触发计分板目标"),
+    ]
+
+
+def get_builtin_admin_commands() -> List[CommandDefinition]:
+    """Get built-in admin level commands."""
+    return [
+        CommandDefinition(command="kick", args="<玩家> [原因]", description="踢出玩家"),
+        CommandDefinition(command="ban", args="<玩家> [原因]", description="封禁玩家"),
+        CommandDefinition(command="pardon", args="<玩家>", description="解封玩家"),
+        CommandDefinition(command="ban-ip", args="<地址|玩家> [原因]", description="封禁IP"),
+        CommandDefinition(command="pardon-ip", args="<地址>", description="解封IP"),
+        CommandDefinition(command="whitelist add", args="<玩家>", description="添加白名单"),
+        CommandDefinition(command="whitelist remove", args="<玩家>", description="移除白名单"),
+        CommandDefinition(command="whitelist on", args="", description="开启白名单"),
+        CommandDefinition(command="whitelist off", args="", description="关闭白名单"),
+        CommandDefinition(command="whitelist reload", args="", description="重载白名单"),
+        CommandDefinition(command="gamemode", args="<模式> [玩家]", description="设置游戏模式"),
+        CommandDefinition(command="tp", args="<实体|坐标>", description="传送实体"),
+        CommandDefinition(command="teleport", args="<实体|坐标>", description="传送实体"),
+        CommandDefinition(command="give", args="<玩家> <物品> [数量]", description="给予物品"),
+        CommandDefinition(command="clear", args="[玩家] [物品] [数量]", description="清除物品"),
+        CommandDefinition(command="effect", args="<玩家> give|clear ...", description="给予/清除效果"),
+        CommandDefinition(command="enchant", args="<玩家> <附魔> [等级]", description="附魔物品"),
+        CommandDefinition(command="summon", args="<实体> [坐标] [数据]", description="召唤实体"),
+        CommandDefinition(command="kill", args="[实体]", description="杀死实体"),
+        CommandDefinition(command="fill", args="<起点> <终点> <方块>", description="填充方块"),
+        CommandDefinition(command="setblock", args="<坐标> <方块>", description="设置方块"),
+        CommandDefinition(command="clone", args="<起点> <终点> <目标>", description="复制方块"),
+        CommandDefinition(command="weather", args="clear|rain|thunder [时长]", description="设置天气"),
+        CommandDefinition(command="time set", args="<时间>", description="设置游戏时间"),
+        CommandDefinition(command="title", args="<玩家> title|subtitle ...", description="显示标题"),
+        CommandDefinition(command="tellraw", args="<玩家> <JSON>", description="发送原始消息"),
+        CommandDefinition(command="msg", args="<玩家> <消息>", description="私聊玩家"),
+        CommandDefinition(command="say", args="<消息>", description="广播消息"),
+        CommandDefinition(command="bossbar set", args="<ID> ...", description="设置Boss栏"),
+        CommandDefinition(command="scoreboard", args="objectives|players ...", description="计分板操作"),
+        CommandDefinition(command="tag", args="<实体> add|remove|list ...", description="标签操作"),
+        CommandDefinition(command="team", args="add|remove|modify ...", description="队伍操作"),
+        CommandDefinition(command="loot", args="<目标> ...", description="战利品操作"),
+        CommandDefinition(command="attribute", args="<实体> <属性> ...", description="属性操作"),
+        CommandDefinition(command="item", args="replace|modify ...", description="物品操作"),
+        CommandDefinition(command="locate", args="structure|biome <类型>", description="定位结构/生物群系"),
+        CommandDefinition(command="spreadplayers", args="<坐标> <间距> ...", description="分散玩家"),
+        CommandDefinition(command="spawnpoint", args="[玩家] [坐标]", description="设置出生点"),
+        CommandDefinition(command="setworldspawn", args="[坐标]", description="设置世界出生点"),
+        CommandDefinition(command="defaultspawnpoint", args="[玩家] [坐标]", description="设置默认出生点"),
+        CommandDefinition(command="worldborder", args="set|center|damage ...", description="世界边界"),
+    ]
+
+
+def get_builtin_superuser_commands() -> List[CommandDefinition]:
+    """Get built-in super user level commands."""
+    return [
+        CommandDefinition(command="stop", args="", description="停止服务器"),
+        CommandDefinition(command="restart", args="", description="重启服务器"),
+        CommandDefinition(command="reload", args="", description="重载数据包"),
+        CommandDefinition(command="save-all", args="[flush]", description="保存所有"),
+        CommandDefinition(command="save-off", args="", description="关闭自动保存"),
+        CommandDefinition(command="save-on", args="", description="开启自动保存"),
+        CommandDefinition(command="debug", args="start|stop", description="调试性能分析"),
+        CommandDefinition(command="perf", args="start|stop", description="性能分析"),
+        CommandDefinition(command="forceload", args="add|remove|query ...", description="强制加载区块"),
+        CommandDefinition(command="gamerule", args="set <规则> <值>", description="设置游戏规则"),
+        CommandDefinition(command="defaultgamemode", args="<模式>", description="设置默认游戏模式"),
+        CommandDefinition(command="publish", args="[端口]", description="开放局域网"),
+        CommandDefinition(command="datapack", args="list|enable|disable ...", description="数据包管理"),
+        CommandDefinition(command="recipe", args="give|take <玩家> ...", description="配方管理"),
+        CommandDefinition(command="advancement", args="grant|revoke ...", description="进度管理"),
+        CommandDefinition(command="experience", args="add|set|query ...", description="经验操作"),
+    ]
+
+
 class SafeCommandsConfig(BaseModel):
     """Safe commands configuration by permission level."""
-    guest: List[str] = Field(default_factory=lambda: ["list", "tps", "whitelist list", "seed", "difficulty"])
-    admin: List[str] = Field(default_factory=lambda: ["whitelist add", "whitelist remove", "whitelist on", "whitelist off", "kick", "ban", "pardon", "gamemode", "tp"])
-    super_user: List[str] = Field(default_factory=lambda: ["stop", "restart", "reload", "save-all", "save-off", "save-on"])
+    guest: List[CommandDefinition] = Field(default_factory=get_builtin_guest_commands)
+    admin: List[CommandDefinition] = Field(default_factory=get_builtin_admin_commands)
+    super_user: List[CommandDefinition] = Field(default_factory=get_builtin_superuser_commands)
+
+    @classmethod
+    def from_yaml(cls, data: dict) -> "SafeCommandsConfig":
+        """
+        Parse from YAML with support for both string and object formats.
+
+        Custom commands are MERGED with built-in commands.
+        Use the command field as key to override built-in command descriptions.
+        """
+        def parse_commands(items: list) -> List[CommandDefinition]:
+            result = []
+            for item in items:
+                if isinstance(item, str):
+                    # Simple string format: "command"
+                    result.append(CommandDefinition(command=item))
+                elif isinstance(item, dict):
+                    # Object format: {command: "...", args: "...", description: "..."}
+                    result.append(CommandDefinition(**item))
+            return result
+
+        def merge_commands(
+            builtin: List[CommandDefinition],
+            custom: List[CommandDefinition]
+        ) -> List[CommandDefinition]:
+            """Merge custom commands with built-in, allowing overrides."""
+            # Create a map of command -> definition for quick lookup
+            cmd_map = {cmd.command.lower(): cmd for cmd in builtin}
+
+            # Add or override with custom commands
+            for cmd in custom:
+                cmd_map[cmd.command.lower()] = cmd
+
+            return list(cmd_map.values())
+
+        # Get custom commands from config
+        custom_guest = parse_commands(data.get("guest", []))
+        custom_admin = parse_commands(data.get("admin", []))
+        custom_superuser = parse_commands(data.get("super_user", []))
+
+        # Merge with built-in commands
+        return cls(
+            guest=merge_commands(get_builtin_guest_commands(), custom_guest),
+            admin=merge_commands(get_builtin_admin_commands(), custom_admin),
+            super_user=merge_commands(get_builtin_superuser_commands(), custom_superuser),
+        )
 
 
 class Config(BaseModel):
     """Main configuration."""
     qq_mode: QQModeConfig = QQModeConfig()
-    safe_commands: SafeCommandsConfig = SafeCommandsConfig()
+    safe_commands: SafeCommandsConfig = Field(default_factory=SafeCommandsConfig)
     blocked_patterns: List[str] = Field(default_factory=lambda: ["op\\s+", "deop\\s+", "execute\\s+"])
     server_aliases: Dict[str, str] = Field(default_factory=dict)
 
@@ -56,6 +202,12 @@ def load_config(config_path: Optional[str]) -> Config:
     if config_path and Path(config_path).exists():
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
+
+        # Parse safe_commands with custom parser for backward compatibility
+        if "safe_commands" in data:
+            safe_commands = SafeCommandsConfig.from_yaml(data["safe_commands"])
+            data["safe_commands"] = safe_commands
+
         return Config(**data)
     return Config()
 
@@ -146,11 +298,24 @@ class SafeCommandResult(BaseModel):
     permission_required: Optional[str] = None
 
 
+class CommandHelpItem(BaseModel):
+    """Single command help item."""
+    command: str
+    args: str = ""
+    description: str = ""
+
+    def to_display(self) -> str:
+        """Format for display."""
+        if self.args:
+            return f"{self.command} {self.args} - {self.description}"
+        return f"{self.command} - {self.description}"
+
+
 class CommandHelpResult(BaseModel):
     """Available commands help for QQ users."""
     environment: str
     permission_level: str
-    commands: Dict[str, List[str]]
+    commands: Dict[str, List[CommandHelpItem]]
 
 
 app = Server("cloudnet-mcp")
@@ -452,7 +617,14 @@ def get_server_alias(name: str) -> str:
 
 
 def check_safe_command(command: str, permission: str = "guest") -> tuple[bool, str]:
-    """Check if command is in safe list for permission level."""
+    """
+    Check if command is in safe list for permission level.
+
+    Permission hierarchy:
+    - guest: can only use guest commands
+    - admin: can use admin + guest commands
+    - super_user: can use all commands
+    """
     if not APP_CONFIG.qq_mode.safe_commands_only:
         return True, "allowed"
 
@@ -461,22 +633,36 @@ def check_safe_command(command: str, permission: str = "guest") -> tuple[bool, s
         if re.search(pattern, command, re.IGNORECASE):
             return False, "blocked"
 
-    # Check permission levels
-    safe_commands = getattr(APP_CONFIG.safe_commands, permission, [])
+    # Define which levels each permission can access
+    # Higher privilege includes lower privilege commands
+    accessible_levels = {
+        "guest": ["guest"],
+        "admin": ["admin", "guest"],
+        "super_user": ["super_user", "admin", "guest"],
+    }
 
-    # Check if command starts with any safe command
-    command_lower = command.lower()
-    for safe_cmd in safe_commands:
-        if command_lower.startswith(safe_cmd.lower()):
-            return True, "allowed"
+    levels_to_check = accessible_levels.get(permission, ["guest"])
 
-    # Try higher permissions
-    if permission == "guest":
-        return check_safe_command(command, "admin")
-    elif permission == "admin":
-        return check_safe_command(command, "super_user")
+    # Check if command matches any safe command definition in accessible levels
+    for level in levels_to_check:
+        safe_commands = getattr(APP_CONFIG.safe_commands, level, [])
+        for cmd_def in safe_commands:
+            if cmd_def.matches(command):
+                return True, "allowed"
 
     return False, "permission_denied"
+
+
+def get_all_commands_for_permission(permission: str) -> List[CommandDefinition]:
+    """Get all available commands for a permission level (including higher levels)."""
+    levels = ["guest", "admin", "super_user"]
+    start_idx = levels.index(permission) if permission in levels else 0
+
+    commands = []
+    for level in levels[start_idx:]:
+        commands.extend(getattr(APP_CONFIG.safe_commands, level, []))
+
+    return commands
 
 
 def get_qq_tools() -> list[types.Tool]:
@@ -1059,39 +1245,26 @@ async def call_tool(
             environment = arguments.get("environment", "MINECRAFT_SERVER")
             permission = arguments.get("permission_level", "guest")
 
-            # Predefined commands by environment
-            all_commands = {
-                "MINECRAFT_SERVER": {
-                    "guest": ["list - 查看在线玩家", "tps - 查看服务器TPS", "seed - 查看种子", "whitelist list - 查看白名单"],
-                    "admin": ["kick <玩家> - 踢出玩家", "ban <玩家> - 封禁玩家", "whitelist add/remove <玩家> - 白名单管理", "gamemode <模式> <玩家> - 更改游戏模式"],
-                    "super_user": ["stop - 停止服务器", "restart - 重启服务器", "reload - 重载配置", "save-all - 保存所有"]
-                },
-                "VELOCITY": {
-                    "guest": ["glist - 查看所有服务器玩家", "server <服务器> - 切换服务器"],
-                    "admin": ["send <玩家> <服务器> - 发送玩家到服务器", "shutdown - 关闭代理"],
-                    "super_user": ["velocity reload - 重载配置", "velocity plugins - 查看插件"]
-                },
-                "BUNGEECORD": {
-                    "guest": ["glist - 查看所有服务器玩家", "server <服务器> - 切换服务器"],
-                    "admin": ["send <玩家> <服务器> - 发送玩家到服务器", "end - 关闭代理"],
-                    "super_user": ["greload - 重载配置"]
-                }
-            }
-
-            env_commands = all_commands.get(environment, all_commands["MINECRAFT_SERVER"])
-
-            # Get commands for this permission level and higher
-            commands = {}
+            # Get commands from config for this permission level and higher
+            commands_by_level: Dict[str, List[CommandHelpItem]] = {}
             levels = ["guest", "admin", "super_user"]
             start_idx = levels.index(permission) if permission in levels else 0
 
             for level in levels[start_idx:]:
-                commands[level] = env_commands.get(level, [])
+                cmd_defs = getattr(APP_CONFIG.safe_commands, level, [])
+                commands_by_level[level] = [
+                    CommandHelpItem(
+                        command=cmd.command,
+                        args=cmd.args,
+                        description=cmd.description
+                    )
+                    for cmd in cmd_defs
+                ]
 
             result = CommandHelpResult(
                 environment=environment,
                 permission_level=permission,
-                commands=commands
+                commands=commands_by_level
             )
             return format_result(result)
 

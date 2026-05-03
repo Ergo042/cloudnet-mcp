@@ -28,42 +28,45 @@ qq_mode:
 
 # Safe Commands Configuration
 # Used by execute_safe_command tool when safe_commands_only is enabled
+#
+# Format: Each command can be either:
+#   - Simple string: "list" (uses built-in description if available)
+#   - Object with details:
+#     command: "list"           # The command prefix
+#     args: ""                  # Argument template (e.g., "<玩家> [原因]")
+#     description: "查看在线玩家" # Chinese description for QQ display
+#
+# Built-in commands are included by default. Add custom commands below to extend.
 safe_commands:
   # Guest level - available to all users
-  guest:
-    - "list"
-    - "tps"
-    - "whitelist list"
-    - "seed"
-    - "difficulty"
-    - "time query"
-    - "gamerule query"
+  # Built-in: list, tps, seed, difficulty, whitelist list, time query, etc.
+  guest: []
+    # Example custom commands:
+    # - command: "stats"
+    #   args: "<玩家>"
+    #   description: "查看玩家统计"
 
   # Admin level - requires admin permission
-  admin:
-    - "whitelist add"
-    - "whitelist remove"
-    - "whitelist on"
-    - "whitelist off"
-    - "kick"
-    - "ban"
-    - "pardon"
-    - "gamemode"
-    - "tp"
-    - "give"
-    - "clear"
-    - "effect"
+  # Built-in: kick, ban, pardon, whitelist add/remove, gamemode, tp, give, etc.
+  admin: []
+    # Example custom commands:
+    # - command: "money"
+    #   args: "set <玩家> <金额>"
+    #   description: "设置玩家余额"
+    # - command: "heal"
+    #   args: "[玩家]"
+    #   description: "治疗玩家"
 
   # Super user level - requires highest permission
-  super_user:
-    - "stop"
-    - "restart"
-    - "reload"
-    - "save-all"
-    - "save-off"
-    - "save-on"
-    - "defaultgamemode"
-    - "gamerule set"
+  # Built-in: stop, restart, reload, save-all, gamerule set, etc.
+  super_user: []
+    # Example custom commands:
+    # - command: "plugins"
+    #   args: ""
+    #   description: "查看插件列表"
+    # - command: "lag"
+    #   args: ""
+    #   description: "查看服务器延迟详情"
 
 # Blocked command patterns (regex)
 # These commands are never allowed, even if in safe_commands
@@ -82,3 +85,65 @@ server_aliases:
   "Creative-1": "创造服"
   "SkyWars-1": "空岛战争"
   "BedWars-1": "起床战争"
+
+# ============================================================
+# BUILT-IN COMMANDS REFERENCE
+# ============================================================
+# The following commands are included by default:
+#
+# GUEST LEVEL (查询类指令):
+#   list                    - 查看在线玩家列表
+#   tps                     - 查看服务器TPS
+#   seed                    - 查看世界种子
+#   difficulty              - 查看游戏难度
+#   whitelist list          - 查看白名单列表
+#   time query              - 查询游戏时间
+#   gamerule query          - 查询游戏规则
+#   scoreboard objectives list - 列出计分板目标
+#   scoreboard players list - 列出计分板玩家
+#   bossbar list            - 列出Boss栏
+#   trigger                 - 触发计分板目标
+#
+# ADMIN LEVEL (管理类指令):
+#   kick <玩家> [原因]      - 踢出玩家
+#   ban <玩家> [原因]       - 封禁玩家
+#   pardon <玩家>           - 解封玩家
+#   ban-ip <地址|玩家> [原因] - 封禁IP
+#   pardon-ip <地址>        - 解封IP
+#   whitelist add <玩家>    - 添加白名单
+#   whitelist remove <玩家> - 移除白名单
+#   whitelist on/off        - 开关白名单
+#   whitelist reload        - 重载白名单
+#   gamemode <模式> [玩家]  - 设置游戏模式
+#   tp <实体|坐标>          - 传送实体
+#   give <玩家> <物品> [数量] - 给予物品
+#   clear [玩家] [物品] [数量] - 清除物品
+#   effect <玩家> give|clear - 给予/清除效果
+#   enchant <玩家> <附魔> [等级] - 附魔物品
+#   summon <实体> [坐标]    - 召唤实体
+#   kill [实体]             - 杀死实体
+#   fill <起点> <终点> <方块> - 填充方块
+#   setblock <坐标> <方块>  - 设置方块
+#   weather clear|rain|thunder - 设置天气
+#   time set <时间>         - 设置游戏时间
+#   title <玩家> ...        - 显示标题
+#   say <消息>              - 广播消息
+#   msg <玩家> <消息>       - 私聊玩家
+#   locate structure|biome  - 定位结构/生物群系
+#   spawnpoint [玩家] [坐标] - 设置出生点
+#
+# SUPER USER LEVEL (服务器管理指令):
+#   stop                    - 停止服务器
+#   restart                 - 重启服务器
+#   reload                  - 重载数据包
+#   save-all [flush]        - 保存所有
+#   save-off                - 关闭自动保存
+#   save-on                 - 开启自动保存
+#   debug start|stop        - 调试性能分析
+#   gamerule set <规则> <值> - 设置游戏规则
+#   defaultgamemode <模式>  - 设置默认游戏模式
+#   publish [端口]          - 开放局域网
+#   datapack list|enable|disable - 数据包管理
+#   recipe give|take        - 配方管理
+#   advancement grant|revoke - 进度管理
+#   experience add|set|query - 经验操作
